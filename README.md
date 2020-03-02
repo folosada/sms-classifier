@@ -31,7 +31,7 @@ With this data the follow items will be shown.
 - After clone the project, run the command `python Main.py`
 - Choose between the two steps:
    - Step 1: Show the graphics and results described in item [Step 1](#purpose_step_1)
-   - Step 2: Classify the SMSs from the file `sms_database.csv` between common messages and spam messages, like [Step 2](#purpose_step_2) describes. This step uses the (Naive Bayes classifier)[https://en.wikipedia.org/wiki/Naive_Bayes_classifier] to classify the SMSs. 
+   - Step 2: Classify the SMSs from the file `sms_database.csv` between common messages and spam messages, like [Step 2](#purpose_step_2) describes. This step uses the [Naive Bayes classifier](https://en.wikipedia.org/wiki/Naive_Bayes_classifier) to classify the SMSs. 
 
 ## Results
 
