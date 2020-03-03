@@ -14,14 +14,19 @@ from datetime import datetime
 import re
 import functools
 
+import statistics
+
 class SMSStatistics(SMSProcessor):
     
     def _changeDateToMonth(self, value):
-        date = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')        
-        ##monthNumber = re.sub(r'\d{2}/(\d{2})/d{4}\s*\d{2}:d{2}', r'\1', value)
+        date = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
         return date.strftime('%B')
 
-    def run(self):
+    def _changeDateToDayAndMonth(self, value):
+        date = datetime.strptime(value, '%Y-%m-%d %H:%M:%S')
+        return date.strftime('%d/%B')
+
+    def _wordcloudGraphic(self):
         ## Importing database
         df = pd.read_csv('./sms_database.csv', encoding='latin-1')
         database = df.drop(['Full_Text', 'Common_Word_Count', 'Word_Count', 'Date', 'IsSpam'], axis=1)
@@ -42,6 +47,7 @@ class SMSStatistics(SMSProcessor):
         plt.savefig(self._outputDir + 'wordcloud.png')
         plt.close()
 
+    def _messagesByMonth(self):
         ## Importing database
         df = pd.read_csv('./sms_database.csv', usecols=['IsSpam', 'Date'], encoding='latin-1')[['IsSpam', 'Date']]
         df.loc[:,'IsSpam'] = df.IsSpam.map({'no':0, 'yes':1})
@@ -88,7 +94,77 @@ class SMSStatistics(SMSProcessor):
         plt.legend()
         plt.savefig(self._outputDir + 'messages-by-month.png')
         plt.close()
+
+    def _valueByMonth(self, biggest: bool, array: list):
+        valueByMonth = {}
+        for item in array:
+            valueByMonth[item[1]] = (item[0] if (biggest and valueByMonth[item[1]] < item[0]) or (not biggest and valueByMonth[item[1]] > item[0]) else valueByMonth[item[1]]) if item[1] in valueByMonth else item[0]
+        return valueByMonth
+
+    def _statistics(self):
+        ## Importing database
+        df = pd.read_csv('./sms_database.csv', usecols=['Word_Count', 'Date'], encoding='latin-1')        
+        df.loc[:,'Date'] = df.Date.map(self._changeDateToMonth)
+        biggestByMonth = self._valueByMonth(True, df.values)
+        smallerByMonth = self._valueByMonth(False, df.values)
+
+        ## Grouping values by month
+        valuesByMonth = {}
+        for item in df.values:
+            if (item[1] in valuesByMonth):
+                valuesByMonth[item[1]].append(item[0])
+            else:
+                valuesByMonth[item[1]] = [item[0]]
+
+        ## Getting statistics values
+        averageByMonth = {}
+        medianByMonth = {}
+        varianceByMonth = {}
+        standardDeviationByMonth = {}
+        for key, value in valuesByMonth.items():
+            averageByMonth[key] = statistics.mean(value)
+            medianByMonth[key] = statistics.median(value)
+            standardDeviationByMonth[key] = statistics.pstdev(value)
+            varianceByMonth[key] = statistics.pvariance(value)
+
+        ## Printing results
+        print('\nStatistics by Month\n')
+        print('Max: {}'.format(biggestByMonth))
+        print('Min: {}'.format(smallerByMonth))
+        print('Average: {}'.format(averageByMonth))
+        print('Median: {}'.format(medianByMonth))
+        print('Standard Deviation: {}'.format(standardDeviationByMonth))
+        print('Variance: {}\n'.format(varianceByMonth))     
+    
+    def _dayWithMoreCommonMessages(self):
+        df = pd.read_csv('./sms_database.csv', usecols=['IsSpam', 'Date'], encoding='latin-1')        
+        df.loc[:,'IsSpam'] = df.IsSpam.map({'no': 1, 'yes': 0})
+        df.loc[:,'Date'] = df.Date.map(self._changeDateToDayAndMonth)
+        months = {}
+        daysOfMonth = {}
+        for item in df.values:
+            daysOfMonth[item[0]] = (daysOfMonth[item[0]] + item[1]) if item[0] in daysOfMonth else item[1]
+
+        for key, value in daysOfMonth.items():
+            monthName = key[3:]
+            day = key[:2]
+            if monthName in months:
+                if months[monthName]['messages'] < int(value):
+                    months[monthName] = {'day': day, 'messages': value}
+            else:
+                months[monthName] = {'day': day, 'messages': value}            
         
-        
+        print('\nDay of the Month with more Common Messages\n')
+        for key, value in months.items():
+            print('Month: {}'.format(key))
+            print('Day: {}'.format(value['day']))
+            print('Common messages: {}'.format(value['messages']))        
+        print('')
+
+    def run(self):
+        self._wordcloudGraphic()
+        self._messagesByMonth()
+        self._statistics()
+        self._dayWithMoreCommonMessages()
 
 SMSStatistics().run()        
