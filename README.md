@@ -8,8 +8,8 @@ With this data the follow items will be shown.
 - <a name=purpose_step_1></a>Step 1:
    - A word cloud graphic containing the most frequently words from the database.
    - A graphic containing the commons messages and spam message by month.
-   - The calculation of the maximum, minimum, average, median, standard deviation and variance of the total number of words.
-   - The day of each month that contains the largest sequence of common messages received (not spam).
+   - <a name="item_3_step_1"></a>The calculation of the maximum, minimum, average, median, standard deviation and variance of the total number of words.
+   - <a name="item_4_step_1"></a>The day of each month that contains the largest sequence of common messages received (not spam).
 
 - <a name=purpose_step_2></a>Step 2:
    - A way to classify the SMSs between common messages and spam messages.
@@ -36,6 +36,12 @@ With this data the follow items will be shown.
 ## Results
 
 - Step 1:
+   - For the first two items the results will be printed in graphics, in images stored in folder `./output/`.
+      - `wordcloud.png`: This file shows the most repeated words in the messages, using a word cloud graphic.
+      - `messages-by-month.png`: This file shows all the messages classified between spam and not spam by month.
+   - For the last two items the results will be printed in console.
+      - `Statistics by Month`: This item shows the result about the item [three](#item_3_step_1) in step 1. Is printed the max, min, average, median, standard deviation and variance.
+      - `Day of the Month with more Common Messages`: This item prints the day of each month that contains the biggest number of common messages, like described in item [four](#item_4_step_1).
 
 - Step 2:
    - The results will be printed in console and the files `output.csv` and `output-difference.csv` will be create in folder `./output/`. The two files has 3 columns

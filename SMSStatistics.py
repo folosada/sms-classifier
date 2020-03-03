@@ -166,5 +166,3 @@ class SMSStatistics(SMSProcessor):
         self._messagesByMonth()
         self._statistics()
         self._dayWithMoreCommonMessages()
-
-SMSStatistics().run()        
