@@ -91,7 +91,7 @@ class SMSStatistics(SMSProcessor):
         plt.xticks([r + barWidth for r in range(len(spams))], months)
         
         # Create legend & Show graphic
-        plt.legend()
+        plt.legend(loc=1)
         plt.savefig(self._outputDir + 'messages-by-month.png')
         plt.close()
 

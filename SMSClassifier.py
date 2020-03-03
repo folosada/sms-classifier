@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
+import time
 
 class SMSClassifier(SMSProcessor):
     
@@ -30,10 +31,14 @@ class SMSClassifier(SMSProcessor):
         ## Use the Naive Bayes classifier
         naiveBayes = MultinomialNB()
         ## Train the machine
+        startTrainingTime = time.time()
         naiveBayes.fit(trainingData, yTrain)
+        elapsedTimeTraining = time.time() - startTrainingTime
 
         ## Run the tests and print the results
+        startTestingTime = time.time()
         predictions = naiveBayes.predict(testingData)
+        elapsedTimeTesting = time.time() - startTestingTime
 
         print('Testing Data\n')
         print('Accuracy score: {}'.format(accuracy_score(yTest, predictions)))
@@ -43,7 +48,9 @@ class SMSClassifier(SMSProcessor):
 
         ## Run the classifier over the full database
         classificationData = countVector.transform(texts)
+        startDatasetTime = time.time()
         predictions = naiveBayes.predict(classificationData)
+        elapsedTimeDataset = time.time() - startDatasetTime
 
         print('Classification results\n')        
         print('Accuracy score: {}'.format(accuracy_score(labels, predictions)))
@@ -51,6 +58,10 @@ class SMSClassifier(SMSProcessor):
         print('Recall score: {}'.format(recall_score(labels, predictions)))
         print('F1 score: {}\n'.format(f1_score(labels, predictions)))
         
+        print('Times to execute\n')
+        print('Elapsed time to Training: {}'.format(elapsedTimeTraining))
+        print('Elapsed time to Testing: {}'.format(elapsedTimeTesting))
+        print('Elapsed time to Dataset: {}'.format(elapsedTimeDataset))
         ## Format the output to save .csv file
         output = [smsCsv.label.values, predictions, smsCsv.sms.values]        
         outputText = 'isSpam,isSpam-Prediction,Full_Text\n'
